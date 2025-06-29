@@ -86,7 +86,14 @@ impl<'a> ConstructorStringParser<'a> {
   // Ref: https://wicg.github.io/urlpattern/#is-a-port-prefix
   #[inline]
   fn is_port_prefix(&self) -> bool {
-    self.is_non_special_pattern_char(self.token_index, ":")
+    if !self.is_non_special_pattern_char(self.token_index, ":") {
+      return false;
+    }
+    let next_token = self.get_safe_token(self.token_index + 1);
+    !matches!(
+      next_token.kind,
+      TokenType::Char if next_token.value == ":"
+    )
   }
 
   // Ref: https://wicg.github.io/urlpattern/#is-a-pathname-start
